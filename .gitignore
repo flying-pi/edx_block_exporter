@@ -107,4 +107,6 @@ venv.bak/
 
 notes/
 .scannerwork
-sonar-scanner.sh
+sonar_login
+
+test_root/
