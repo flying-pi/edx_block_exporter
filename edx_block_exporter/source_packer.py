@@ -1,3 +1,5 @@
+import inspect
+
 import os
 from collections import namedtuple
 from importlib import  import_module
@@ -16,8 +18,6 @@ XBlockField = namedtuple("XBlockField", ['name', 'class_name', 'serializer', 'st
 
 
 class XBlockDecomposer(object):
-    IGNORED_MODULE_MEMBERS = ['__builtins__', '__doc__', '__file__', '__name__', '__package__', '__path__']
-
     def __init__(self, block_usage_key_str):
         """
         :param str block_usage_key_str: string representation of the block
@@ -54,14 +54,29 @@ class XBlockDecomposer(object):
         return module_path.split('.')[0]
 
     @staticmethod
-    def _get_recursive_root_path_dep(module):
+    def _is_system_name(attr_name):
+        """
+
+        :param str attr_name :
+        :return:
+        """
+        return not (attr_name.startswith("__") and attr_name.startswith("__"))
+
+    @staticmethod
+    def _get_recursive_root_path_dep(module_obj):
         result = set()
-        for member in dir(module):
-            if member not in XBlockDecomposer.IGNORED_MODULE_MEMBERS:
-                #TODO(flyingpi): use getattr here
-                #TODO(flyingpi): ignore test here
-                result.add(XBlockDecomposer._root_module_name(member.__name__))
-                result.update(XBlockDecomposer._get_recursive_root_path_dep(member))
+        try:
+            for member_name in dir(module_obj):
+                member = getattr(module_obj, member_name)
+                if inspect.ismodule(member):
+                    result.add(XBlockDecomposer._root_module_name(member.__name__))
+                    result.update(XBlockDecomposer._get_recursive_root_path_dep(member))
+        #             TODO do something with circle imports
+        except:
+
+            import pydevd_pycharm
+            pydevd_pycharm.settrace('host.docker.internal', port=3758, stdoutToServer=True, stderrToServer=True)
+            print('asasasasas')
         return result
 
     def _get_relative_pathes(self, module):
@@ -71,11 +86,14 @@ class XBlockDecomposer(object):
             module_name = package_to_discover.pop()
             while module_name in module_path_mapping:
                 module_name = package_to_discover.pop()
-            import pydevd_pycharm
-            pydevd_pycharm.settrace('host.docker.internal', port=3758, stdoutToServer=True, stderrToServer=True)
             imported_module = import_module(module_name)
             module_path_mapping[module_name] = '/'.join(os.path.abspath(imported_module.__file__).split('/')[:-1])+'/'
             package_to_discover.update(self._get_recursive_root_path_dep(imported_module))
+
+
+            import pydevd_pycharm
+            pydevd_pycharm.settrace('host.docker.internal', port=3758, stdoutToServer=True, stderrToServer=True)
+            print('asasasasas')
 
 
 
@@ -84,3 +102,17 @@ class XBlockDecomposer(object):
         module = self.block.unmixed_class
         fields = self._get_fields_info(module)
         dep_file_pathes = self._get_relative_pathes(module)
+
+
+
+"""
+import sys, traceback
+try:
+    
+    self._get_recursive_root_path_dep(imported_module)
+    
+except:
+    traceback.print_exc(file=sys.stdout)
+
+
+"""
