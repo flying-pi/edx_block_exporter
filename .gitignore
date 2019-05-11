@@ -105,8 +105,10 @@ venv.bak/
 
 .idea/
 
-notes/
+local_notes/
 .scannerwork
 sonar_login
 
 test_root/
+
+report/*
