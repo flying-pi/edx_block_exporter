@@ -3,7 +3,6 @@ WORKDIR := $(shell pwd)
 SONAR_SICRET=`cat sonar_login`
 CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 
-SERVICE_VARIANT=cms
 PYTHONPATH=$PYTHONPATH:/edx/app/edxapp/edx-platform/cms/djangoapps/:${WORKDIR}/
 DJANGO_SETTINGS_MODULE=cms.envs.test
 TEST_ROOT_DIR=./test_root

@@ -1,0 +1,3 @@
+XBlock==1.2.1
+-e git+https://github.com/raccoongang/edx-platform.git@4c3519c80a6f615dfac8ef33b6a150093e80b474#egg=Open_edX
+
