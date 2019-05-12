@@ -50,7 +50,7 @@ class XBlockDecomposer(object):
         block_type = self.block_usage_key.block_type
         return XBlockInfo(
             fields=self._get_fields_info(module),
-            class_name=module.__module__ + module.__name__,
+            class_name='.'.join([module.__module__, module.__name__]),
             pip_install_str=self._get_setup_instruction(block_type),
             block_type=block_type
         )
