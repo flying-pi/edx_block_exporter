@@ -7,8 +7,23 @@ from xblock.fields import UserScope, Sentinel
 from contentstore.views.helpers import usage_key_with_run
 from xmodule.modulestore.django import modulestore
 
-XBlockInfo = namedtuple("XBlockInfo", ['fields', 'class_name', 'pip_install_str', 'block_type'])
+
+def _named_tuple_to_dict(tuple):
+    return {name: getattr(tuple, name) for name in tuple._fields}
+
+
 XBlockField = namedtuple("XBlockField", ['name', 'class_name', 'serializer', 'str_value', 'is_save_value'])
+
+
+class XBlockInfo(namedtuple("BaseXBlockInfo", ['fields', 'class_name', 'pip_install_str', 'block_type'])):
+
+    def as_dict(self):
+        result = {}
+        for name, value in _named_tuple_to_dict(self).items():
+            if name == 'fields':
+                value = [_named_tuple_to_dict(field) for field in value]
+            result[name] = value
+        return result
 
 
 class XBlockDecomposer(object):
@@ -32,7 +47,11 @@ class XBlockDecomposer(object):
             }
 
             if value.scope.user == UserScope.NONE:
-                field_info['str_value'] = module.fields['name'].to_json(getattr(self.block, name))
+                # if isinstance(getattr(self.block, name), datetime):
+                    # import pydevd_pycharm
+                    # pydevd_pycharm.settrace('host.docker.internal', port=3758, stdoutToServer=True, stderrToServer=True)
+                    # print ('asdasd')
+                field_info['str_value'] = module.fields[name].to_json(getattr(self.block, name))
                 field_info['is_save_value'] = True
 
             fields.append(XBlockField(**field_info))

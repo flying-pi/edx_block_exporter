@@ -2,6 +2,7 @@ from xblock.core import XBlock
 from xblock.fields import String, Scope
 
 
+# TODO(flyingpi): Add other field type, i.e. Time, TimeDelta..
 class ToyXblockWithFieldsOnly(XBlock):
     user_relative = String(default="for some user", scope=Scope.user_state, help="State of the user")
     settings_relative = String(default="this is setting", scope=Scope.content, help="This is content")
